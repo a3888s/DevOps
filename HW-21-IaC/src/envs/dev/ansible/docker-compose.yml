@@ -1,0 +1,32 @@
+version: '3.8'  # Визначення версії Docker Compose
+
+services:
+  wordpress:
+    image: wordpress:latest     # Остання версія образу WordPress
+    container_name: wordpress    # Ім'я контейнера для WordPress
+    restart: always              # Автоматичний перезапуск контейнера при збоях
+    ports:
+      - "80:80"                  # Відкриття порту 80 для доступу до WordPress
+    environment:                 # Перемінні середовища для підключення до бази даних
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpresspass
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress_data:/var/www/html  # Мапінг тома для зберігання даних WordPress
+
+  db:
+    image: mysql:5.7            # Версія образу MySQL
+    container_name: wordpress_db # Ім'я контейнера для бази даних
+    restart: always             # Автоматичний перезапуск контейнера при збоях
+    environment:                # Перемінні середовища для налаштування бази даних
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpresspass
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - db_data:/var/lib/mysql  # Мапінг тома для зберігання даних бази даних
+
+volumes:
+  wordpress_data:   # Том для зберігання даних WordPress
+  db_data:          # Том для зберігання даних бази даних

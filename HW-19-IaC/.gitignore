@@ -1,0 +1,3 @@
+src/.terraform
+src/.terraform.lock.hcl
+src/terraform.tfstate

@@ -1,0 +1,13 @@
+[Unit]
+Description=Watch Directory Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /home/a3888s/my_danit_lesson/0_DZ/HW-2/dz_1.sh
+Restart=on-failure
+User=a3888s
+Environment=HOME=/home/a3888s
+
+[Install]
+WantedBy=multi-user.target

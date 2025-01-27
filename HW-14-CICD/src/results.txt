@@ -1,0 +1,209 @@
+[]
+{
+    "age": 32,
+    "first_name": "Olexndr",
+    "id": 1,
+    "last_name": "Skibchyk"
+}
+{
+    "age": 22,
+    "first_name": "Oleksii",
+    "id": 2,
+    "last_name": "Pupkin"
+}
+{
+    "age": 23,
+    "first_name": "Andrii",
+    "id": 3,
+    "last_name": "Bandera"
+}
+[
+    {
+        "age": "32",
+        "first_name": "Olexndr",
+        "id": "1",
+        "last_name": "Skibchyk"
+    },
+    {
+        "age": "22",
+        "first_name": "Oleksii",
+        "id": "2",
+        "last_name": "Pupkin"
+    },
+    {
+        "age": "23",
+        "first_name": "Andrii",
+        "id": "3",
+        "last_name": "Bandera"
+    }
+]
+{
+    "age": 24,
+    "first_name": "Oleksii",
+    "id": "2",
+    "last_name": "Pupkin"
+}
+{
+    "age": "24",
+    "first_name": "Oleksii",
+    "id": "2",
+    "last_name": "Pupkin"
+}
+{
+    "age": 25,
+    "first_name": "Taras",
+    "id": "3",
+    "last_name": "Prepod"
+}
+{
+    "age": "25",
+    "first_name": "Taras",
+    "id": "3",
+    "last_name": "Prepod"
+}
+[
+    {
+        "age": "32",
+        "first_name": "Olexndr",
+        "id": "1",
+        "last_name": "Skibchyk"
+    },
+    {
+        "age": "24",
+        "first_name": "Oleksii",
+        "id": "2",
+        "last_name": "Pupkin"
+    },
+    {
+        "age": "25",
+        "first_name": "Taras",
+        "id": "3",
+        "last_name": "Prepod"
+    }
+]
+{
+    "message": "Student deleted successfully"
+}
+[
+    {
+        "age": "24",
+        "first_name": "Oleksii",
+        "id": "2",
+        "last_name": "Pupkin"
+    },
+    {
+        "age": "25",
+        "first_name": "Taras",
+        "id": "3",
+        "last_name": "Prepod"
+    }
+]
+{
+    "age": 32,
+    "first_name": "Olexndr",
+    "id": 4,
+    "last_name": "Skibchyk"
+}
+{
+    "age": 22,
+    "first_name": "Oleksii",
+    "id": 5,
+    "last_name": "Pupkin"
+}
+{
+    "age": 23,
+    "first_name": "Andrii",
+    "id": 6,
+    "last_name": "Bandera"
+}
+[
+    {
+        "age": "24",
+        "first_name": "Oleksii",
+        "id": "2",
+        "last_name": "Pupkin"
+    },
+    {
+        "age": "25",
+        "first_name": "Taras",
+        "id": "3",
+        "last_name": "Prepod"
+    },
+    {
+        "age": "32",
+        "first_name": "Olexndr",
+        "id": "4",
+        "last_name": "Skibchyk"
+    },
+    {
+        "age": "22",
+        "first_name": "Oleksii",
+        "id": "5",
+        "last_name": "Pupkin"
+    },
+    {
+        "age": "23",
+        "first_name": "Andrii",
+        "id": "6",
+        "last_name": "Bandera"
+    }
+]
+{
+    "age": 24,
+    "first_name": "Oleksii",
+    "id": "2",
+    "last_name": "Pupkin"
+}
+{
+    "age": "24",
+    "first_name": "Oleksii",
+    "id": "2",
+    "last_name": "Pupkin"
+}
+{
+    "age": 25,
+    "first_name": "Taras",
+    "id": "3",
+    "last_name": "Prepod"
+}
+{
+    "age": "25",
+    "first_name": "Taras",
+    "id": "3",
+    "last_name": "Prepod"
+}
+[
+    {
+        "age": "24",
+        "first_name": "Oleksii",
+        "id": "2",
+        "last_name": "Pupkin"
+    },
+    {
+        "age": "25",
+        "first_name": "Taras",
+        "id": "3",
+        "last_name": "Prepod"
+    },
+    {
+        "age": "32",
+        "first_name": "Olexndr",
+        "id": "4",
+        "last_name": "Skibchyk"
+    },
+    {
+        "age": "22",
+        "first_name": "Oleksii",
+        "id": "5",
+        "last_name": "Pupkin"
+    },
+    {
+        "age": "23",
+        "first_name": "Andrii",
+        "id": "6",
+        "last_name": "Bandera"
+    }
+]
+{
+    "error": "Student not found"
+}

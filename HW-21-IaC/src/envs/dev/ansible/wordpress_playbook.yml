@@ -1,0 +1,62 @@
+---
+- name: Setup Docker and deploy Docker Compose application
+  hosts: webservers
+  become: true
+  tasks:
+
+    # Встановлення Docker
+    - name: Install prerequisites
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+        update_cache: yes
+
+    - name: Install Docker Compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    # Створення директорії для проекту
+    - name: Create project directory
+      file:
+        path: /home/ubuntu/code/wordpress-project
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    # Копіювання файлу docker-compose.yml
+    - name: Copy docker-compose.yml to project directory
+      copy:
+        src: /home/a3888s/my_danit_lesson/0_DZ/HW-21/src/envs/dev/ansible/docker-compose.yml  # Локальний шлях до файлу
+        dest: /home/ubuntu/code/wordpress-project/docker-compose.yml
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+
+    # Запуск Docker Compose
+    - name: Run Docker Compose
+      command: docker-compose -f /home/ubuntu/code/wordpress-project/docker-compose.yml up -d
+      args:
+        chdir: /home/ubuntu/code/wordpress-project

@@ -1,0 +1,48 @@
+Vagrant.configure("2") do |config|
+  config.vm.define "jenkins-server" do |server|
+    server.vm.box = "ubuntu/bionic64"
+    server.vm.network "public_network", type: "bridge"
+    server.vm.hostname = "jenkins-server"
+    server.vm.provision "shell", inline: <<-SHELL
+      sudo apt-get update
+      sudo apt-get upgrade -y
+
+      if dpkg --compare-versions "$(apt-cache policy init-system-helpers | grep Installed | awk '{print $2}')" lt 1.54; then
+        wget http://ftp.debian.org/debian/pool/main/i/init-system-helpers/init-system-helpers_1.60_all.deb
+        sudo dpkg -i init-system-helpers_1.60_all.deb
+        rm init-system-helpers_1.60_all.deb
+      fi
+
+      sudo apt-get install -y fontconfig openjdk-17-jre
+      java -version
+
+      sudo wget -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+      echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+      sudo apt-get update
+      sudo apt-get install -y jenkins
+      ifconfig
+      sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+    SHELL
+  end
+
+  config.vm.define "jenkins-worker" do |server|
+    server.vm.box = "ubuntu/bionic64"
+    server.vm.network "public_network", type: "bridge"
+    server.vm.hostname = "jenkins-worker"
+    server.vm.provision "shell", inline: <<-SHELL
+      sudo apt-get update
+      sudo apt-get install -y fontconfig openjdk-17-jre
+      java -version
+
+      sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+      sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+      sudo apt-get update
+      sudo apt-get install -y docker-ce
+      sudo usermod -aG docker vagrant
+      sudo usermod -aG docker jenkins
+      docker --version
+    SHELL
+  end
+end

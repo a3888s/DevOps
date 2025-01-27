@@ -1,0 +1,61 @@
+Завдання 1: Керування користувачами та групами
+
+1. Створення облікових записів користувачів:
+sudo adduser dev1
+sudo adduser dev2
+sudo adduser dev3
+
+2. Створення груп:
+sudo addgroup developers
+sudo addgroup webmasters
+
+3. Призначення користувачів до груп:
+sudo usermod -aG developers dev1
+sudo usermod -aG developers dev2
+sudo usermod -aG webmasters dev3
+
+4. Встановити групу за замовчуванням для користувачів:
+
+5. Створення домашніх каталогів:
+ls /home
+
+6. Клонуйте обліковий запис користувача:
+sudo useradd -m -d /home/backupdev -G developers backupdev
+sudo cp -r /home/dev1/* /home/backupdev/
+sudo chown -R backupdev:developers /home/backupdev
+
+7. Налаштування дозволів для спільного проекту:
+sudo mkdir /home/web_project
+sudo chown root:developers /home/web_project
+sudo chmod 775 /home/web_project
+
+8. Незмінний файл журналу:
+sudo touch /home/my.log
+sudo chown root:root /home/my.log
+sudo chmod 644 /home/my.log
+
+Завдання 2: Моніторинг використання диска
+crontab -e
+0 * * * * /home/a3888s/my_danit_lesson/0_DZ/HW-7/script-cheek-disc.sh
+
+Завдання 3: Конфігурація Monit для моніторингу Nginx
+sudo apt install monit
+sudo systemctl start monit
+sudo systemctl enable monit
+sudo vi /etc/monit/conf.d/nginx.monitrc
+
+check process nginx with pidfile /var/run/nginx.pid
+   start program = "/etc/init.d/nginx start"
+   stop program  = "/etc/init.d/nginx stop"
+   if failed host 127.0.0.1 port 80 protocol http
+      with timeout 10 seconds
+      for 7 cycles
+   then restart
+   if 5 restarts within 5 cycles then timeout
+
+sudo systemctl restart monit
+set httpd port 2812 and
+    use address 0.0.0.0
+    allow 0.0.0.0/0
+    allow admin:monit
+

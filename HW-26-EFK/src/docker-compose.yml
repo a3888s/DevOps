@@ -1,0 +1,42 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - network.host=0.0.0.0
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.0
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOST=http://elasticsearch:9200
+
+  fluentd:
+    image: fluent/fluentd-kubernetes-daemonset:v1.14.0-debian-elasticsearch7-1.0
+    ports:
+      - "24224:24224"
+    environment:
+      - FLUENTD_CONF=fluentd.conf
+    volumes:
+      -  ./fluentd.conf:/fluentd/etc/fluentd.conf
+      - /var/log:/var/log
+
+  node_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node_app
+    ports:
+      - "3000:3000"
+
+volumes:
+  esdata:
+    driver: local

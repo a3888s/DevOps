@@ -1,0 +1,29 @@
+groups:
+  - name: system_alerts
+    rules:
+      - alert: LowDiskSpace
+        expr: node_filesystem_free_bytes / node_filesystem_size_bytes < 0.15
+        for: 2s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Мало дискового простору на {{ $labels.instance }}"
+          description: "Вільного місця на диску менше 15%. {{ $labels.instance }}."
+
+      - alert: HighCpuUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 80
+        for: 2s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Високе використання ЦП на {{ $labels.instance }}"
+          description: "Завантаження ЦП перевищує 80%. {{ $labels.instance }}."
+
+      - alert: TargetDown
+        expr: up == 0
+        for: 2s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Ціль {{ $labels.instance }} не працює"
+          description: "Ціль Prometheus {{ $labels.instance }} недоступна"

@@ -1,0 +1,12 @@
+sudo adduser bob
+sudo usermod -aG sudo bob
+
+chmod u+x /home/a3888s/my_danit_lesson/0_DZ/HW-5/change_hostname.sh
+
+/home/a3888s/my_danit_lesson/0_DZ/HW-5/change_hostname.sh
+sudo reboot
+
+sudo apt update
+sudo apt install nginx
+
+netstat -tuln

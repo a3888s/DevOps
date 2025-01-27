@@ -1,0 +1,84 @@
+APP_HOST='192.168.0.13'
+APP_USER='a3888s'
+DB_HOST='192.168.0.14'
+APP_PORT='82'
+DB_PORT='3306'
+DB_USER='a3888s'
+DB_PASS='1qazZSE$4321'
+DB_NAME='PetClinic'
+
+# Налаштування версії Vagrantfile
+Vagrant.configure("2") do |config|
+  # Вказуємо, яку базову віртуальну машину використовувати
+  config.vm.box = "ubuntu/bionic64"
+
+  # Визначаємо масив з назвами віртуальних машин
+  vm_names = ["DB", "APP"]
+
+  # Проходимо по кожній назві віртуальної машини з масиву
+  vm_names.each_with_index do |n, i|
+    # Визначаємо віртуальну машину з унікальною назвою
+    config.vm.define "VM-#{n}" do |srv|
+      # Встановлюємо ім'я хоста
+      srv.vm.hostname = "VM-#{n}"
+
+      # Налаштовуємо ресурси віртуальної машини (пам'ять та процесори)
+      srv.vm.provider "virtualbox" do |vb|
+        vb.memory = "2048"
+        vb.cpus = "2"
+      end
+
+      # Налаштовуємо приватну мережу для віртуальної машини
+      if n == "APP"
+        srv.vm.network "private_network", ip: APP_HOST
+        # Прокидуємо порт для APP
+        srv.vm.network "forwarded_port", guest: APP_PORT, host: APP_PORT
+      elsif n == "DB"
+        srv.vm.network "private_network", ip: DB_HOST
+        # Прокидуємо порт для DB
+        srv.vm.network "forwarded_port", guest: DB_PORT, host: DB_PORT
+      end
+
+      # Визначаємо різні команди для провізії залежно від назви машини
+      if n == "DB"
+        # Для машини "DB" виконується оновлення пакетів та установка MySQL
+        srv.vm.provision "shell", inline: <<-SHELL
+          sudo apt update
+          DB_PASS='1qazZSE$4321'
+          sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password #{DB_PASS}'
+          sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password #{DB_PASS}'
+          sudo apt install -y mysql-server
+
+          # Bind MySQL to the private network IP
+          sudo sed -i "s/.*bind-address.*/bind-address = #{DB_HOST}/" /etc/mysql/mysql.conf.d/mysqld.cnf
+          sudo systemctl restart mysql
+
+          # Configure MySQL
+          sudo mysql -uroot -p${DB_PASS} -e "CREATE DATABASE IF NOT EXISTS #{DB_NAME};"
+          sudo mysql -uroot -p${DB_PASS} -e "CREATE USER IF NOT EXISTS '#{DB_USER}'@'%' IDENTIFIED BY '#{DB_PASS}';"
+          sudo mysql -uroot -p${DB_PASS} -e "GRANT ALL PRIVILEGES ON #{DB_NAME}.* TO '#{DB_USER}'@'%';"
+          sudo mysql -uroot -p${DB_PASS} -e "FLUSH PRIVILEGES;"
+        SHELL
+      elsif n == "APP"
+        # Для машини "APP" виконується лише оновлення пакетів та встановлення MySQL клієнта
+        srv.vm.provision "shell", inline: <<-SHELL
+          sudo apt update
+          sudo apt install -y mysql-client
+          # Перевірка підключення до MySQL на VM-DB
+          mysql -h #{DB_HOST} -u #{DB_USER} -p#{DB_PASS} -e "SHOW DATABASES;"
+          sudo apt install -y default-jdk git
+          sudo apt install maven -y
+          sudo adduser --disabled-password --gecos "" --force-badname #{APP_USER}
+          sudo usermod -aG sudo #{APP_USER}
+          cd /home/#{APP_USER}
+          sudo -u #{APP_USER} git clone https://gitlab.com/my_dan.it/my_danit_lesson.git
+          cd /home/#{APP_USER}/my_danit_lesson/0_DZ/Project-Demo/PetClinic/
+          # sudo -u #{APP_USER} mvn spring-boot:run -Dspring-boot.run.profiles=mysql
+          # sudo -u #{APP_USER} mvn package
+          # sudo -u #{APP_USER} java -jar target/*.jar
+        SHELL
+      end
+    end
+  end
+end
+

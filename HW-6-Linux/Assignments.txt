@@ -1,0 +1,15 @@
+sudo adduser john
+
+sudo apt update
+sudo apt install ssh
+sudo systemctl enable ssh
+sudo systemctl start ssh
+sudo nano /etc/ssh/sshd_config
+
+#/etc/ssh/sshd_config
+PermitRootLogin no
+PasswordAuthentication no
+Port 2222
+
+sudo systemctl restart ssh
+sudo systemctl status ssh

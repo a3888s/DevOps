@@ -1,0 +1,81 @@
+---
+- name: Налаштування Nginx з HTTPS
+  hosts: jenkins-master
+  become: true
+  vars:
+    domain_name: "jenkins.starvape.space"
+    email: "sowdirect@gmail.com"
+
+  tasks:
+    - name: Оновлення кешу пакетів
+      apt:
+        update_cache: yes
+
+    - name: Встановлення Nginx та Certbot
+      apt:
+        name:
+          - nginx
+          - certbot
+          - python3-certbot-nginx
+        state: present
+
+    - name: Переконатися, що Nginx запущений
+      service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Створити базову конфігурацію Nginx
+      copy:
+        dest: /etc/nginx/sites-available/{{ domain_name }}
+        content: |
+          server {
+              listen 80;
+              server_name {{ domain_name }};
+
+              location / {
+                  proxy_pass http://127.0.0.1:8080;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+              }
+          }
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Активувати конфігурацію сайту
+      file:
+        src: /etc/nginx/sites-available/{{ domain_name }}
+        dest: /etc/nginx/sites-enabled/{{ domain_name }}
+        state: link
+
+    - name: Видалити конфігурацію "default"
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Перевірити конфігурацію Nginx
+      command: nginx -t
+      register: nginx_test
+      failed_when: nginx_test.rc != 0
+
+    - name: Перезапустити Nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: Отримати SSL-сертифікат для {{ domain_name }}
+      command: >
+        certbot --nginx --non-interactive
+        --agree-tos
+        --redirect
+        --email {{ email }}
+        -d {{ domain_name }}
+      register: certbot_result
+      failed_when: certbot_result.rc != 0
+
+    - name: Вивести результат сертифікації
+      debug:
+        msg: "Certbot result: {{ certbot_result.stdout }}"

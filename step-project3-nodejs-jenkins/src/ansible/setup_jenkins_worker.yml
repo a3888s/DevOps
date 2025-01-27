@@ -1,0 +1,132 @@
+---
+- name: Налаштування Jenkins Worker
+  hosts: jenkins-worker
+  become: true
+  vars:
+    jenkins_master_url: "http://16.16.217.126:8080"
+    agent_name: "worker"
+    agent_secret: "2331a498bae200f3273f4c2cfebb9484c6ac2b1489bf7116fdde7f0542381440"
+    work_dir: "/opt/jenkins"
+    jenkins_agent_log: "/opt/jenkins/jenkins_agent.log"
+    ssh_key_path: "/home/ubuntu/.ssh/id_rsa_jenkins"
+
+  tasks:
+    - name: Оновлення кешу пакетів
+      apt:
+        update_cache: yes
+
+    - name: Встановлення необхідних пакетів для Java
+      apt:
+        name: fontconfig
+        state: present
+    - name: Встановлення Java 17
+      apt:
+        name: openjdk-17-jre
+        state: present
+
+    - name: Перевірка версії Java
+      command: java -version
+      register: java_version_output
+      ignore_errors: true
+    - debug:
+        msg: "Версія Java: {{ java_version_output.stdout }}"
+
+    - name: Встановлення додаткових пакетів для Docker
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Додавання Docker GPG ключа
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Додавання Docker репозиторію
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Оновлення кешу після додавання Docker репозиторію
+      apt:
+        update_cache: yes
+
+    - name: Встановлення Docker
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Додавання користувача ubuntu до групи docker
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Перевірка версії Docker
+      command: docker --version
+      register: docker_version_output
+      ignore_errors: true
+    - debug:
+        msg: "Версія Docker: {{ docker_version_output.stdout }}"
+
+    - name: Перейти до /opt та створити каталог для Jenkins
+      file:
+        path: "{{ work_dir }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Генерація SSH-ключів для Jenkins Worker
+      command: ssh-keygen -t rsa -b 2048 -f {{ ssh_key_path }} -N ""
+      args:
+        creates: "{{ ssh_key_path }}"
+
+    - name: Виведення приватного SSH-ключа
+      shell: "cat {{ ssh_key_path }}"
+      register: ssh_private_key_output
+      no_log: true
+
+    - name: Вивести приватний SSH-ключ
+      debug:
+        msg: "Приватний SSH-ключ:\n{{ ssh_private_key_output.stdout }}"
+
+    - name: Виведення публічного SSH-ключа
+      shell: "cat {{ ssh_key_path }}.pub"
+      register: ssh_public_key_output
+    - debug:
+        msg: "Публічний SSH-ключ:\n{{ ssh_public_key_output.stdout }}"
+
+    - name: Завантажити agent.jar з Jenkins Master
+      get_url:
+        url: "{{ jenkins_master_url }}/jnlpJars/agent.jar"
+        dest: "{{ work_dir }}/agent.jar"
+        mode: '0755'
+
+    - name: Запустити Jenkins Agent з використанням WebSocket
+      shell: |
+        nohup java -jar {{ work_dir }}/agent.jar -url {{ jenkins_master_url }} -secret {{ agent_secret }} -name {{ agent_name }} -webSocket -workDir "{{ work_dir }}" > {{ jenkins_agent_log }} 2>&1 &
+      args:
+        chdir: "{{ work_dir }}"
+      async: 10
+      poll: 0
+
+    - name: Очікування підключення агента Jenkins
+      wait_for:
+        path: "{{ jenkins_agent_log }}"
+        search_regex: "Connected"
+        delay: 5
+        timeout: 120  # Збільшено тайм-аут до 120 секунд
+
+    - name: Перевірка журналу агента Jenkins (в разі помилки)
+      shell: "cat {{ jenkins_agent_log }}"
+      register: log_output
+      failed_when: log_output.rc != 0
+      ignore_errors: yes
+
+    - name: Вивести журнал агента Jenkins для діагностики
+      debug:
+        var: log_output.stdout_lines

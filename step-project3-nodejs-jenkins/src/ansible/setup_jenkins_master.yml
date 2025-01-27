@@ -1,0 +1,56 @@
+---
+- name: Встановлення Jenkins Master
+  hosts: jenkins-master
+  become: true
+  tasks:
+    - name: Оновлення пакунків
+      apt:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Додавання ключа репозиторію Jenkins
+      apt_key:  # ansible module to add key
+        url:  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        state: present
+
+    - name: Додавання репозиторію Jenkins
+      apt_repository: #ansible module to add repo
+        repo: 'deb https://pkg.jenkins.io/debian-stable binary/'
+        state: present
+
+    - name: Оновлення кешу після додавання Jenkins репозиторію
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Встановити Java 17 для Jenkins
+      apt:
+        name: openjdk-17-jdk
+        state: present
+
+
+    - name: Встановлення Jenkins
+      apt:
+        name: jenkins
+        state: present
+
+    - name: Переконатися, що Jenkins запущений і ввімкнений
+      service:
+        name: jenkins
+        state: started
+        enabled: true
+
+    - name: Очікування, поки Jenkins запуститься
+      wait_for:
+        port: 8080
+        state: started
+        timeout: 300
+
+    - name: Отримання початкового паролю для Jenkins
+      command: "cat /var/lib/jenkins/secrets/initialAdminPassword"
+      register: jenkins_initial_password
+      no_log: true
+
+    - name: Виведення початкового паролю для Jenkins
+      debug:
+        msg: "Jenkins початковий пароль: {{ jenkins_initial_password.stdout }}"

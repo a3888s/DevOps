@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+
+    environment {
+        GITLAB_CREDENTIALS = credentials('gitlab-ssh-credentials')
+        DOCKER_CREDENTIALS = 'dockerhub-tocken'
+        DOCKER_IMAGE = "a3888s/forstep3"
+  }
+
+    stages {
+        stage('Отримання коду') {
+            steps {
+                git branch: 'main', credentialsId: 'gitlab-ssh-credentials', url: 'git@gitlab.com:my_dan.it/forstep2.git'
+            }
+        }
+
+        stage('Збірка') {
+            steps {
+                script {
+                    sh 'docker system prune -af'
+                    sh 'docker images rm -a'
+                    dockerImage = docker.build(DOCKER_IMAGE)
+                }
+            }
+        }
+
+        stage('Тестування') {
+            steps {
+                script {
+                    sh 'docker run -t ${DOCKER_IMAGE} npm test'
+                }
+            }
+        }
+
+        stage('Розгортання') {
+            steps {
+                script {
+                    sh 'docker run -d --name forstep2-container ${DOCKER_IMAGE} npm start'
+                }
+            }
+        }
+
+        stage('Публікація в Docker Hub') {
+            when {
+                expression { currentBuild.currentResult == 'SUCCESS' }
+            }
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS) {
+                        docker.image(DOCKER_IMAGE).push()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                sh 'docker rm -f forstep2-container || true'
+                sh 'docker system prune -f'
+            }
+        }
+
+        success {
+            echo 'Пайплайн успішно виконано!'
+        }
+
+        failure {
+            echo 'Пайплайн завершився невдало!'
+        }
+    }
+}
