@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: python-backend-ingress        # Назва ресурсу Ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx # Використання класу Ingress для NGINX
+spec:
+  rules:
+    - host: "app.a3888s.test-danit.com" # Домен для доступу до додатка
+      http:
+        paths:
+          - path: /                      # Кореневий маршрут
+            pathType: Prefix             # Тип маршруту (Prefix відповідає всім підшляхам)
+            backend:
+              service:
+                name: python-backend-service # Назва сервісу, на який направляється трафік
+                port:
+                  number: 80             # Порт сервісу для обробки запитів

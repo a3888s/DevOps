@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: step-final-prod                # Назва додатка в ArgoCD
+  namespace: argocd                   # Простір імен, у якому розгорнуто ArgoCD
+spec:
+  project: default                    # Проєкт в ArgoCD (за замовчуванням "default")
+  source:
+    repoURL: 'https://github.com/a3888s/step-final.git'  # URL Git-репозиторію з кодом
+    targetRevision: main               # Основна гілка репозиторію
+    path: app/k8s/prod                 # Шлях до Kubernetes YAML-файлів у репозиторії
+  destination:
+    server: 'https://kubernetes.default.svc' # Kubernetes API-сервер для цільового кластера
+    namespace: prod                    # Простір імен, у якому буде розгорнуто додаток
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true          # Автоматичне створення простору імен, якщо його немає

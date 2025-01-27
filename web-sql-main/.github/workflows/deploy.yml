@@ -1,0 +1,34 @@
+name: environments workflow
+run-name: tu tu ru tu tu tu 
+on: [push]
+
+jobs:
+  windows-job:
+    runs-on: windows-latest
+    steps:
+      - name: using powershell
+        shell: pwsh
+        run: |
+          Get-Location
+          Write-Output "Finished at $(Get-Date)"
+
+  macos-job:
+    needs: windows-job
+    runs-on: macos-latest
+    steps:
+      - name: running in mac
+        shell: bash
+        run: |
+          echo Hello world
+          echo "Finished at $(date)"
+
+  linux-job:
+    needs: windows-job
+    runs-on: ubuntu-latest
+    steps:
+      - name: running in ubuntu
+        shell: bash
+        run: |
+          echo Hello world
+          echo "Finished at $(date)"
+

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-backend-service        # Назва сервісу
+spec:
+  selector:
+    app: python-backend               # Вибирає поди з міткою "app=python-backend"
+  ports:
+    - protocol: TCP                   # Протокол зв'язку (TCP)
+      port: 80                        # Порт сервісу для зовнішнього доступу
+      targetPort: 8080                # Порт всередині контейнера
+  type: ClusterIP                     # Тип сервісу: доступ тільки всередині кластера

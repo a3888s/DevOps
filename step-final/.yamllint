@@ -1,0 +1,8 @@
+extends: default  # Розширює стандартні правила yamllint
+
+rules:
+  line-length:
+    max: 120      # Максимальна довжина рядка (замість 80)
+    level: warning  # Попередження, а не помилка
+  document-start:
+    present: true  # Перевіряє, чи є '---' на початку документа

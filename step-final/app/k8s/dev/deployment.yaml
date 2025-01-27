@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-backend                # Назва Deployment
+spec:
+  replicas: 1                         # Кількість реплік (один екземпляр додатка)
+  selector:
+    matchLabels:
+      app: python-backend             # Мітка для вибору подів
+  template:
+    metadata:
+      labels:
+        app: python-backend           # Мітка для подів
+    spec:
+      containers:
+        - name: python-backend
+          image: a3888s/step-final-project:v1.0.2
+          ports:
+            - containerPort: 8080     # Відкритий порт контейнера
