@@ -1,0 +1,21 @@
+env
+
+# Логи та тимчасові файли
+*.log
+*.bak
+*.tmp
+*.swp
+*.backup
+*.retry
+.DS_Store
+
+# Локальні файли та ключі SSH
+*.pem
+*.key
+*.crt
+*.pub
+
+# Інші системні файли
+Thumbs.db
+ehthumbs.db
+Desktop.ini

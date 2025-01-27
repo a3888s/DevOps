@@ -1,0 +1,49 @@
+---
+- name: Deploy Django App in Docker
+  hosts: docker-app-dev
+  become: yes
+
+  vars:
+    repo_url: "https://github.com/a3888s/django-app-template.git"
+    branch: "dev"
+    code_path: "/home/a3888s/code/django-app-template"
+    docker_image: "a3888s/django-app-dev:v1.1.2"
+    docker_compose_file: "/home/a3888s/code/django-app-template/docker-compose.yml"
+
+  tasks:
+    # 1. Установка необхідних пакетів
+    - name: Install required packages
+      apt:
+        name:
+          - git
+        state: present
+        update_cache: yes
+
+    # 2. Клонування або оновлення репозиторію
+    - name: Clone or update the repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ code_path }}"
+        version: "{{ branch }}"
+        force: yes
+
+
+    # 3. Перевірка наявності docker-compose.yml
+    - name: Ensure docker-compose.yml exists
+      stat:
+        path: "{{ docker_compose_file }}"
+      register: compose_file
+
+    - name: Fail if docker-compose.yml is missing
+      fail:
+        msg: "docker-compose.yml is missing in {{ code_path }}"
+      when: not compose_file.stat.exists
+
+    # 4. Запуск сервісів через Docker Compose
+    - name: Deploy Django app with Docker Compose
+      command: >
+        docker compose
+        -f {{ docker_compose_file }}
+        up -d
+      args:
+        chdir: "{{ code_path }}"

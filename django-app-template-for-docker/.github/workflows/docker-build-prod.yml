@@ -1,0 +1,58 @@
+name: Release and Push Docker Image
+
+on:
+  pull_request:
+    types: [closed]                  # Запускається, коли PR закрито (merged)
+    branches:
+      - main                         # Тільки для PR, об’єднаних у main
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true  # Виконується тільки якщо PR був merged
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Дозволяє створювати релізи
+
+
+    steps:
+      # Крок 1: Клонування репозиторію
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Крок 2: Завантаження .env
+      - name: Load .env file
+        run: |
+          set -a
+          source .env
+          echo "DOCKER_TAG=${DOCKER_TAG}" >> $GITHUB_ENV
+
+      # Крок 3: Логін у Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Побудова Docker-образу
+      - name: Build Docker Image
+        run: |
+          docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/django-app-dev-prod:${DOCKER_TAG}" -f Dockerfile .
+
+      # Завантаження Docker-образу
+      - name: Push Docker Image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/django-app-dev-prod:${DOCKER_TAG}
+
+      # Крок 6: Створення GitHub-релізу
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ env.DOCKER_TAG }}
+          release_name: Release ${{ env.DOCKER_TAG }}
+          body: |
+            This release includes Docker image:
+            `docker pull ${{ secrets.DOCKERHUB_USERNAME }}/django-app-dev-prod:${{ env.DOCKER_TAG }}`
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

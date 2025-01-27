@@ -1,0 +1,19 @@
+---
+- name: Install QEMU Guest Agent
+  hosts: all
+  become: true
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install QEMU Guest Agent
+      apt:
+        name: qemu-guest-agent
+        state: present
+
+    - name: Enable and start QEMU Guest Agent service
+      systemd:
+        name: qemu-guest-agent
+        enabled: yes
+        state: started

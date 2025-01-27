@@ -1,0 +1,31 @@
+#global:
+#  resolve_timeout: 1m
+#
+#route:
+#  receiver: 'telegram'
+#
+#receivers:
+#  - name: 'telegram'
+#    telegram_configs:
+#      - bot_token: 7907049462:AAH9Draj78EjN-midny1PMRtc9hryxthtKA
+#        chat_id: -4737239420
+#        message: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+
+
+global:
+  resolve_timeout: 1m
+
+route:
+  receiver: 'telegram'
+
+receivers:
+- name: 'telegram'
+  telegram_configs:
+  - bot_token: 7907049462:AAH9Draj78EjN-midny1PMRtc9hryxthtKA
+    api_url: https://api.telegram.org
+    chat_id: -4728808772
+    parse_mode: 'HTML'
+    message: '{{ template "telegram.message". }}'
+
+templates:
+- '/etc/alertmanager/telegram.tmpl'
