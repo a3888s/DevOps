@@ -1,0 +1,19 @@
+all:
+  hosts:
+    Crusader:
+      ansible_host: IP
+      ansible_user: root
+      ansible_password: "password"
+      ansible_port: port
+
+    Crow:
+      ansible_host: IP
+      ansible_user: root
+      ansible_password: "password"
+      ansible_port: port
+
+    Raptor:
+      ansible_host: IP
+      ansible_user: root
+      ansible_password: "password"
+      ansible_port: port
