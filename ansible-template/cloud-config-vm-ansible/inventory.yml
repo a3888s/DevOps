@@ -1,19 +1,13 @@
 all:
   hosts:
-    Crusader:
-      ansible_host: IP
+    Nyx:
+      ansible_host: 95.216.244.174
       ansible_user: root
-      ansible_password: "password"
-      ansible_port: port
+      ansible_password: "g8XxFpVWAwy4s5"
+      ansible_port: 22
 
-    Crow:
-      ansible_host: IP
-      ansible_user: root
-      ansible_password: "password"
-      ansible_port: port
-
-    Raptor:
-      ansible_host: IP
-      ansible_user: root
-      ansible_password: "password"
-      ansible_port: port
+    Basilisk:
+      ansible_host: 95.216.102.106
+      ansible_user: key4
+      ansible_password: "1lrk5sdMb3dN2EFxW6sAt9jGv"
+      ansible_port: 22665
