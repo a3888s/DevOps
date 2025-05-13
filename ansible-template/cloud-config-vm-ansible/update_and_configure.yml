@@ -5,10 +5,10 @@
   vars:
     users:
       - { name: "key4", password: "1lrk5sdMb3dN2EFxW6sAt9jGv" }
-      - { name: "keyapp", password: "GmkZ0rUFUsPRm4fn5QA6kv6WS" }
+    #      - { name: "keyapp", password: "GmkZ0rUFUsPRm4fn5QA6kv6WS" }
     hostnames:
-      Nyx: "nyx"
-      Basilisk: "basilisk"
+      Nyx: "docker-core-01"
+    #      Basilisk: "basilisk"
     zabbix_server: "78.47.184.136"
     ssh_port: 22665
 
@@ -17,6 +17,33 @@
       apt:
         update_cache: yes
         upgrade: yes
+
+    - name: Встановлення часового поясу Europe/Kyiv
+      timezone:
+        name: Europe/Kyiv
+
+    - name: Встановлення systemd-timesyncd (служба синхронізації часу)
+      apt:
+        name: systemd-timesyncd
+        state: present
+
+    - name: Увімкнення служби синхронізації часу
+      systemd:
+        name: systemd-timesyncd
+        enabled: yes
+        state: started
+
+    - name: Налаштування time сервера (pool.ntp.org)
+      lineinfile:
+        path: /etc/systemd/timesyncd.conf
+        regexp: '^#?NTP='
+        line: 'NTP=0.ua.pool.ntp.org 1.ua.pool.ntp.org'
+        state: present
+
+    - name: Перезапуск служби синхронізації часу після змін
+      systemd:
+        name: systemd-timesyncd
+        state: restarted
 
     - name: Встановлення нового hostname
       hostname:
@@ -71,7 +98,7 @@
         line: 'PermitRootLogin without-password'
         state: present
 
-    - name: Перезавантаження systemd для застосування змін (Ubuntu 24.04+)
+    - name: Перезавантаження systemd для застосування змін
       command: systemctl daemon-reload
 
     - name: Перезапуск SSH або ssh.socket для застосування змін
@@ -145,3 +172,9 @@
         name: fail2ban
         state: restarted
         enabled: yes
+
+    - name: Встановлення iptables-persistent
+      apt:
+        name: iptables-persistent
+        state: present
+        install_recommends: yes
