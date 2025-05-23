@@ -9,6 +9,7 @@
     hostnames:
       docker-core-01: "docker-core-01"
       docker-core-02: "docker-core-02"
+      docker-core-03: "docker-core-03"
     #      Basilisk: "basilisk"
     zabbix_server: "78.47.184.136"
     ssh_port: 22666

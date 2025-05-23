@@ -6,6 +6,8 @@ all:
           ansible_host: 10.11.11.90
         docker-core-02:
           ansible_host: 10.11.11.91
+        docker-core-03:
+          ansible_host: 10.11.11.92
       vars:
         ansible_user: root
         ansible_port: 22
