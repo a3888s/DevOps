@@ -7,6 +7,7 @@
       - { name: "key4", password: "1lrk5sdMb3dN2EFxW6sAt9jGv" }
     #      - { name: "keyapp", password: "GmkZ0rUFUsPRm4fn5QA6kv6WS" }
     hostnames:
+      docker-core-01: "docker-core-01"
       docker-core-02: "docker-core-02"
     #      Basilisk: "basilisk"
     zabbix_server: "78.47.184.136"
