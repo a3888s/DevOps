@@ -1,0 +1,23 @@
+---
+- name: Вимкнути IPv6 через sysctl
+  sysctl:
+    name: "{{ item }}"
+    value: "1"
+    sysctl_set: yes
+    state: present
+    reload: yes
+  loop:
+    - net.ipv6.conf.all.disable_ipv6
+    - net.ipv6.conf.default.disable_ipv6
+
+- name: Вимкнути IPv6 через GRUB
+  lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX='
+    line: 'GRUB_CMDLINE_LINUX="ipv6.disable=1"'
+    backup: yes
+
+- name: Оновити GRUB
+  command: update-grub
+  when: ansible_facts['distribution'] == "Ubuntu"
+

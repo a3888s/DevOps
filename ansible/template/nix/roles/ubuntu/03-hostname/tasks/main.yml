@@ -1,0 +1,14 @@
+- name: Set hostname
+  hostname:
+    name: "{{ hostnames[inventory_hostname] }}"
+
+- name: Update /etc/hostname
+  copy:
+    dest: /etc/hostname
+    content: "{{ hostnames[inventory_hostname] }}\n"
+
+- name: Update /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^(127\\.0\\.1\\.1\\s+)'
+    line: '127.0.1.1 {{ hostnames[inventory_hostname] }}'

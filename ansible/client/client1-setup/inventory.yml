@@ -1,0 +1,11 @@
+all:
+  children:
+    setup:
+      hosts:
+        clikchouse-mv:
+          ansible_host: 94.130.164.117
+          ansible_password: jdpvhkwSwdGv8i
+      vars:
+        ansible_user: root
+        ansible_port: 22
+        ansible_connection: ssh

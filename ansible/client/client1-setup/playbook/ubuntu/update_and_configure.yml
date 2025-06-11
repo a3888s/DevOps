@@ -1,0 +1,15 @@
+- name: Оновлення та налаштування серверів
+  hosts: all
+  become: yes
+  vars_files:
+    - ../../group_vars/all.yml
+  roles:
+    - { role: 01-common, tags: ["common"] }
+    - { role: 02-timezone, tags: ["timezone"] }
+    - { role: 03-hostname, tags: ["hostname"] }
+    - { role: 04-users, tags: ["users"] }
+    - { role: 05-ssh, tags: ["ssh"] }
+    - { role: 06-zabbix, tags: ["zabbix"] }
+    - { role: 07-fail2ban, tags: ["fail2ban"] }
+    - { role: 08-iptables, tags: ["iptables"] }
+    - { role: 09-ipv6, tags: ["ipv6"] }

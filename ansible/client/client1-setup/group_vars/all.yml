@@ -1,0 +1,9 @@
+users:
+  - { name: "user1", password: "password" }
+  - { name: "user2", password: "password" }
+
+hostnames:
+  server1: "hostname"
+
+zabbix_server: "10.10.10.11"
+ssh_port: 22126

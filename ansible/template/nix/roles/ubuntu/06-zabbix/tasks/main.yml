@@ -1,0 +1,35 @@
+- name: Download Zabbix repo
+  get_url:
+    url: "https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-2+ubuntu24.04_all.deb"
+    dest: "/tmp/zabbix-release_7.0-2+ubuntu24.04_all.deb"
+
+- name: Install Zabbix repo
+  command:
+    cmd: "dpkg -i /tmp/zabbix-release_7.0-2+ubuntu24.04_all.deb"
+  args:
+    creates: "/etc/apt/sources.list.d/zabbix.list"
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install Zabbix Agent2
+  apt:
+    name: zabbix-agent2
+    state: present
+
+- name: Configure Zabbix Agent2
+  lineinfile:
+    path: /etc/zabbix/zabbix_agent2.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: '^Server=', line: "Server={{ zabbix_server }}" }
+    - { regexp: '^ServerActive=', line: "ServerActive={{ zabbix_server }}" }
+    - { regexp: '^Hostname=', line: "Hostname={{ hostnames[inventory_hostname] }}" }
+
+- name: Enable and restart Zabbix Agent2
+  systemd:
+    name: zabbix-agent2
+    enabled: yes
+    state: restarted

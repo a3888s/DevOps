@@ -1,0 +1,26 @@
+- name: Change SSH port
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?Port '
+    line: 'Port {{ ssh_port }}'
+
+- name: Disable root login via password
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PermitRootLogin'
+    line: 'PermitRootLogin without-password'
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Restart SSH services
+  block:
+    - name: Restart ssh
+      service:
+        name: ssh
+        state: restarted
+      ignore_errors: true
+
+    - name: Restart ssh.socket if ssh failed (Ubuntu 24.04+)
+      command: systemctl restart ssh.socket
+      when: ansible_distribution_version is version('24.04', '>=')

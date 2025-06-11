@@ -1,0 +1,21 @@
+- name: Create users
+  user:
+    name: "{{ item.name }}"
+    password: "{{ item.password | password_hash('sha512') }}"
+    shell: /bin/bash
+    create_home: yes
+  loop: "{{ users }}"
+
+- name: Add users to sudo group
+  user:
+    name: "{{ item.name }}"
+    groups: sudo
+    append: yes
+  loop: "{{ users }}"
+
+- name: Allow passwordless sudo
+  copy:
+    dest: "/etc/sudoers.d/{{ item.name }}"
+    content: "{{ item.name }} ALL=(ALL) NOPASSWD:ALL"
+    mode: '0440'
+  loop: "{{ users }}"

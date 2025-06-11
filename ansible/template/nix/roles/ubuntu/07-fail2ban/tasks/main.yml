@@ -1,0 +1,23 @@
+- name: Install Fail2Ban
+  apt:
+    name: fail2ban
+    state: present
+
+- name: Configure Fail2Ban SSH jail
+  copy:
+    dest: /etc/fail2ban/jail.local
+    content: |
+      [sshd]
+      enabled = true
+      port = {{ ssh_port }}
+      filter = sshd
+      action = iptables-multiport[name=SSH, port={{ ssh_port }}, protocol=tcp]
+      logpath = /var/log/auth.log
+      maxretry = 5
+    mode: '0644'
+
+- name: Enable and restart Fail2Ban
+  systemd:
+    name: fail2ban
+    enabled: yes
+    state: restarted
