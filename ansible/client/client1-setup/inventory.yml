@@ -2,9 +2,9 @@ all:
   children:
     setup:
       hosts:
-        clikchouse-mv:
-          ansible_host: 94.130.164.117
-          ansible_password: jdpvhkwSwdGv8i
+        name1:
+          ansible_host: 10.10.10.10
+          ansible_password: pass
       vars:
         ansible_user: root
         ansible_port: 22
